@@ -1,0 +1,321 @@
+CREATE DATABASE Capacitaciones;
+USE Capacitaciones;
+
+-- Tabla para estudiantes
+CREATE TABLE Estu (
+    EstuID INT AUTO_INCREMENT PRIMARY KEY,
+    Nom VARCHAR(100) NOT NULL,
+    Apel VARCHAR(100) NOT NULL,
+    NumID VARCHAR(20) UNIQUE NOT NULL,
+    FecReg DATE DEFAULT CURRENT_DATE
+);
+
+-- Tabla para profesores
+CREATE TABLE Prof (
+    ProfID INT AUTO_INCREMENT PRIMARY KEY,
+    Nom VARCHAR(100) NOT NULL,
+    Apel VARCHAR(100) NOT NULL,
+    NumID VARCHAR(20) UNIQUE NOT NULL
+);
+
+-- Tabla para tipos de contacto (para flexibilidad en contactos)
+CREATE TABLE TipCont (
+    TipContID INT AUTO_INCREMENT PRIMARY KEY,
+    Descripcion VARCHAR(50) NOT NULL UNIQUE
+);
+
+-- Tabla para contactos de estudiantes
+CREATE TABLE ContEstu (
+    ContID INT AUTO_INCREMENT PRIMARY KEY,
+    EstuID INT NOT NULL,
+    TipContID INT NOT NULL,
+    Val VARCHAR(255) NOT NULL,
+    FOREIGN KEY (EstuID) REFERENCES Estu(EstuID),
+    FOREIGN KEY (TipContID) REFERENCES TipCont(TipContID)
+);
+
+-- Tabla para contactos de profesores
+CREATE TABLE ContProf (
+    ContID INT AUTO_INCREMENT PRIMARY KEY,
+    ProfID INT NOT NULL,
+    TipContID INT NOT NULL,
+    Val VARCHAR(255) NOT NULL,
+    FOREIGN KEY (ProfID) REFERENCES Prof(ProfID),
+    FOREIGN KEY (TipContID) REFERENCES TipCont(TipContID)
+);
+
+-- Tabla para cursos
+CREATE TABLE Cur (
+    CurID INT AUTO_INCREMENT PRIMARY KEY,
+    Nom VARCHAR(150) NOT NULL,
+    DescripcionCur TEXT NOT NULL,  -- Renombrada columna Descripcion a DescripcionCur
+    FecLim DATE NOT NULL
+);
+
+-- Tabla para materiales del curso
+CREATE TABLE MatCur (
+    MatID INT AUTO_INCREMENT PRIMARY KEY,
+    CurID INT NOT NULL,
+    NomArch VARCHAR(255) NOT NULL,
+    RutaArch VARCHAR(255) NOT NULL,
+    FOREIGN KEY (CurID) REFERENCES Cur(CurID)
+);
+
+-- Tabla para horarios de cursos
+CREATE TABLE Hora (
+    HoraID INT AUTO_INCREMENT PRIMARY KEY,
+    CurID INT NOT NULL,
+    ProfID INT NOT NULL,
+    Fec DATE NOT NULL,
+    HorIni TIME NOT NULL,
+    HorFin TIME NOT NULL,
+    FOREIGN KEY (CurID) REFERENCES Cur(CurID),
+    FOREIGN KEY (ProfID) REFERENCES Prof(ProfID)
+);
+
+-- Tabla para disponibilidad de profesores
+CREATE TABLE DispProf (
+    DispID INT AUTO_INCREMENT PRIMARY KEY,
+    ProfID INT NOT NULL,
+    Fec DATE NOT NULL,
+    HorIni TIME NOT NULL,
+    HorFin TIME NOT NULL,
+    FOREIGN KEY (ProfID) REFERENCES Prof(ProfID)
+);
+
+-- Tabla para inscripción de estudiantes en cursos
+CREATE TABLE Inscrip (
+    InsID INT AUTO_INCREMENT PRIMARY KEY,
+    EstuID INT NOT NULL,
+    HoraID INT NOT NULL,
+    FOREIGN KEY (EstuID) REFERENCES Estu(EstuID),
+    FOREIGN KEY (HoraID) REFERENCES Hora(HoraID)
+);
+
+-- Tabla para calificaciones de estudiantes
+CREATE TABLE Calif (
+    CalifID INT AUTO_INCREMENT PRIMARY KEY,
+    InsID INT NOT NULL,
+    Nota DECIMAL(5, 2) CHECK (Nota >= 0 AND Nota <= 100),
+    Apro BOOLEAN NOT NULL,
+    Comentario TEXT,  -- Renombrada columna Descripcion a Comentario
+    FOREIGN KEY (InsID) REFERENCES Inscrip(InsID)
+);
+
+
+-- Insertar informacion:
+
+-- Insertar registros en TipCont
+INSERT INTO TipCont (Descripcion) VALUES
+('Teléfono'), ('Celular'), ('Email'), ('Dirección'), ('Fax');
+
+-- Insertar registros en Estu
+INSERT INTO Estu (Nom, Apel, NumID) VALUES
+('Juan', 'Pérez', 'ID001'),
+('María', 'Gómez', 'ID002'),
+('Carlos', 'Ruiz', 'ID003'),
+('Ana', 'Martínez', 'ID004'),
+('Luis', 'Torres', 'ID005'),
+('Laura', 'Hernández', 'ID006'),
+('Pedro', 'Sánchez', 'ID007'),
+('Sofía', 'Ramírez', 'ID008'),
+('Miguel', 'Díaz', 'ID009'),
+('Paula', 'Vega', 'ID010'),
+('Andrea', 'Pérez', 'ID011'),
+('David', 'García', 'ID012'),
+('Fernanda', 'Ortiz', 'ID013'),
+('Sebastián', 'Jiménez', 'ID014'),
+('Camila', 'Rojas', 'ID015'),
+('Mateo', 'Salazar', 'ID016'),
+('Valeria', 'Guzmán', 'ID017'),
+('Daniel', 'Navarro', 'ID018'),
+('Santiago', 'Mejía', 'ID019'),
+('Gabriela', 'Castaño', 'ID020');
+
+-- Insertar registros en Prof
+INSERT INTO Prof (Nom, Apel, NumID) VALUES
+('Ricardo', 'Lopez', 'PID001'),
+('Lucía', 'Fernandez', 'PID002'),
+('Andrés', 'Castro', 'PID003'),
+('Verónica', 'Reyes', 'PID004'),
+('Jorge', 'Moreno', 'PID005'),
+('Manuel', 'Londoño', 'PID006'),
+('Patricia', 'Rincón', 'PID007'),
+('Gabriel', 'Córdoba', 'PID008'),
+('Natalia', 'Barrios', 'PID009'),
+('Carolina', 'Estrada', 'PID010');
+
+-- Insertar registros en ContEstu
+INSERT INTO ContEstu (EstuID, TipContID, Val) VALUES
+(1, 3, 'juan.perez@email.com'),
+(2, 2, '3001234567'),
+(3, 1, '6012345678'),
+(4, 4, 'Cra 45 #123-45'),
+(5, 3, 'luis.torres@email.com'),
+(6, 2, '3009876543'),
+(7, 1, '6012345679'),
+(8, 4, 'Calle 50 #10-20'),
+(9, 3, 'miguel.diaz@email.com'),
+(10, 2, '3011234567'),
+(11, 3, 'andrea.perez@email.com'),
+(12, 2, '3002345678'),
+(13, 1, '6013456789'),
+(14, 4, 'Calle 23 #45-67'),
+(15, 3, 'camila.rojas@email.com'),
+(16, 2, '3205678910'),
+(17, 1, '6015678901'),
+(18, 4, 'Avenida 10 #12-14'),
+(19, 3, 'santiago.mejia@email.com'),
+(20, 2, '3015678902');
+
+-- Insertar registros en ContProf
+INSERT INTO ContProf (ProfID, TipContID, Val) VALUES
+(1, 3, 'ricardo.lopez@email.com'),
+(2, 2, '3001112222'),
+(3, 1, '6015671234'),
+(4, 4, 'Avenida Siempre Viva #10-10'),
+(5, 3, 'jorge.moreno@email.com'),
+(6, 3, 'manuel.londono@email.com'),
+(7, 2, '3016789012'),
+(8, 1, '6017890123'),
+(9, 4, 'Calle 90 #12-45'),
+(10, 3, 'carolina.estrada@email.com');
+
+-- Insertar registros en Cur
+INSERT INTO Cur (Nom, DescripcionCur, FecLim) VALUES
+('Matemáticas Básicas', 'Curso de fundamentos matemáticos', '2025-06-30'),
+('Inglés Avanzado', 'Curso intensivo de inglés', '2025-08-15'),
+('Programación en Python', 'Introducción a Python y proyectos básicos', '2025-09-01'),
+('Historia Universal', 'Estudio de los principales eventos históricos', '2025-10-10'),
+('Diseño Gráfico', 'Principios y herramientas de diseño gráfico', '2025-11-20'),
+('Estadística', 'Introducción a conceptos de estadística', '2025-12-01'),
+('Cálculo Diferencial', 'Funciones y derivadas básicas', '2025-12-15'),
+('Inteligencia Artificial', 'Fundamentos y aplicaciones prácticas', '2026-01-20'),
+('Bases de Datos', 'Modelado y consultas SQL', '2026-02-10'),
+('Álgebra Lineal', 'Matrices y sistemas lineales', '2026-03-05');
+
+-- Insertar registros en Hora
+INSERT INTO Hora (CurID, ProfID, Fec, HorIni, HorFin) VALUES
+(1, 1, '2025-02-01', '08:00:00', '10:00:00'),
+(2, 2, '2025-02-02', '10:00:00', '12:00:00'),
+(3, 3, '2025-02-03', '14:00:00', '16:00:00'),
+(4, 4, '2025-02-04', '08:00:00', '10:00:00'),
+(5, 5, '2025-02-05', '16:00:00', '18:00:00'),
+(6, 6, '2025-07-01', '08:00:00', '10:00:00'),
+(7, 7, '2025-08-01', '10:00:00', '12:00:00'),
+(8, 8, '2025-09-01', '14:00:00', '16:00:00'),
+(9, 9, '2025-10-01', '08:00:00', '10:00:00'),
+(10, 10, '2025-11-01', '16:00:00', '18:00:00');
+
+-- Insertar registros en Inscrip
+INSERT INTO Inscrip (EstuID, HoraID) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
+
+-- Insertar registros en Calif
+INSERT INTO Calif (InsID, Nota, Apro, Obs) VALUES
+(1, 85.5, TRUE, 'Buen desempeño'),
+(2, 90.0, TRUE, 'Excelente participación'),
+(3, 78.0, TRUE, 'Necesita mejorar en ejercicios'),
+(4, 60.0, FALSE, 'Faltó a varias clases'),
+(5, 92.5, TRUE, 'Excelente trabajo en equipo'),
+(6, 88.0, TRUE, 'Dominó los conceptos principales'),
+(7, 70.5, TRUE, 'Participación aceptable'),
+(8, 65.0, FALSE, 'Faltó preparación en exámenes'),
+(9, 95.0, TRUE, 'Sobresaliente en el curso'),
+(10, 55.0, FALSE, 'Desempeño insuficiente');
+
+
+-- Consultas
+
+-- Esta consulta obtiene los cursos que están siendo dictados actualmente
+-- Se filtran por fecha para mostrar solo los cursos futuros
+SELECT C.Nom AS Curso, C.DescripcionCur, H.Fec, H.HorIni, H.HorFin, P.Nom AS Profesor, P.Apel
+FROM Cur C
+JOIN Hora H ON C.CurID = H.CurID
+JOIN Prof P ON H.ProfID = P.ProfID
+WHERE H.Fec >= CURDATE();  -- Asegura que solo se muestren los cursos actuales
+
+-- Esta consulta muestra los estudiantes que están inscritos en un curso específico
+-- Se filtra por el nombre del curso
+SELECT E.Nom AS Estudiante, E.Apel, C.Nom AS Curso
+FROM Estu E
+JOIN Inscrip I ON E.EstuID = I.EstuID
+JOIN Hora H ON I.HoraID = H.HoraID
+JOIN Cur C ON H.CurID = C.CurID
+WHERE C.Nom = 'Inglés Avanzado';  -- Reemplazar con el nombre del curso deseado
+
+-- Esta consulta muestra a los estudiantes que han aprobado sus cursos
+-- Ordenados por la mejor calificación de mayor a menor
+SELECT E.Nom AS Estudiante, E.Apel, C.Nom AS Curso, CA.Nota, CA.Apro
+FROM Estu E
+JOIN Inscrip I ON E.EstuID = I.EstuID
+JOIN Hora H ON I.HoraID = H.HoraID
+JOIN Cur C ON H.CurID = C.CurID
+JOIN Calif CA ON I.InsID = CA.InsID
+WHERE CA.Apro = TRUE
+ORDER BY CA.Nota DESC;  -- Ordena de la mejor calificación a la peor
+
+
+-- Esta consulta obtiene los cursos con el mejor promedio de notas
+-- Y los profesores que los dictaban, ordenados de mayor a menor promedio
+SELECT C.Nom AS Curso, AVG(CA.Nota) AS Promedio, P.Nom AS Profesor, P.Apel
+FROM Cur C
+JOIN Hora H ON C.CurID = H.CurID
+JOIN Prof P ON H.ProfID = P.ProfID
+JOIN Inscrip I ON I.HoraID = H.HoraID
+JOIN Calif CA ON I.InsID = CA.InsID
+GROUP BY C.CurID, P.ProfID
+ORDER BY Promedio DESC;  -- Ordena por el promedio de calificaciones, del mejor al peor
+
+-- Esta consulta muestra a los estudiantes que más han perdido cursos
+-- Y su promedio de calificaciones, considerando solo los cursos que no aprobaron
+SELECT E.Nom AS Estudiante, E.Apel, COUNT(CA.CalifID) AS CursosPerdidos, AVG(CA.Nota) AS PromedioNotas
+FROM Estu E
+JOIN Inscrip I ON E.EstuID = I.EstuID
+JOIN Calif CA ON I.InsID = CA.InsID
+WHERE CA.Apro = FALSE
+GROUP BY E.EstuID
+ORDER BY CursosPerdidos DESC;  -- Ordena por el número de cursos perdidos
+
+-- Esta consulta muestra las estadísticas de las notas de los cursos que un profesor ha dictado
+-- Incluye el rango de notas (mínima y máxima) y el promedio por curso
+SELECT P.Nom AS Profesor, P.Apel, C.Nom AS Curso, 
+       MIN(CA.Nota) AS NotaMinima, 
+       MAX(CA.Nota) AS NotaMaxima, 
+       AVG(CA.Nota) AS PromedioNota
+FROM Prof P
+JOIN Hora H ON P.ProfID = H.ProfID
+JOIN Cur C ON H.CurID = C.CurID
+JOIN Inscrip I ON I.HoraID = H.HoraID
+JOIN Calif CA ON I.InsID = CA.InsID
+GROUP BY P.ProfID, C.CurID
+ORDER BY P.Nom, C.Nom;  -- Ordena por el nombre del profesor y curso
+
+-- Esta consulta muestra a los estudiantes que están inscritos en un curso específico
+-- En un horario y fecha determinados
+SELECT E.Nom AS Estudiante, E.Apel, C.Nom AS Curso, H.Fec, H.HorIni, H.HorFin
+FROM Estu E
+JOIN Inscrip I ON E.EstuID = I.EstuID
+JOIN Hora H ON I.HoraID = H.HoraID
+JOIN Cur C ON H.CurID = C.CurID
+WHERE H.Fec = '2025-02-01'  -- Reemplazar con la fecha específica del horario
+AND H.HorIni = '08:00:00';  -- Reemplazar con la hora específica del horario
+
+-- Esta consulta muestra todos los cursos que un estudiante ha tomado
+SELECT E.Nom AS Estudiante, E.Apel, C.Nom AS Curso
+FROM Estu E
+JOIN Inscrip I ON E.EstuID = I.EstuID
+JOIN Hora H ON I.HoraID = H.HoraID
+JOIN Cur C ON H.CurID = C.CurID
+WHERE E.EstuID = 2;  -- Reemplazar con el ID del estudiante
+
+
